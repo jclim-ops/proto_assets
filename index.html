@@ -5,9 +5,9 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{width:100%;height:100%;background:#07071a;display:flex;justify-content:center;align-items:center;font-family:sans-serif;overflow:hidden}
-.scene{display:none;flex-direction:column;align-items:center;width:min(100vw,calc(100vh * 9 / 16));height:min(100vh,calc(100vw * 16 / 9));overflow:hidden}
+.scene{display:none;flex-direction:column;align-items:center;width:min(100vw,calc(100vh * 9 / 16));height:min(100vh,calc(100vw * 16 / 9));overflow:hidden;position:relative;flex-shrink:0}
 .scene.active{display:flex}
-#scene-start{justify-content:center;position:relative;overflow:hidden}
+#scene-start{justify-content:center;overflow:hidden}
 #sc{position:absolute;top:0;left:0;width:100%;height:100%}
 .start-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;padding:0 24px}
 .logo-title{font-size:42px;font-weight:700;letter-spacing:-1px;background:linear-gradient(135deg,#FFD700,#FF9900,#FF44AA);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.1;margin-bottom:6px}
@@ -50,17 +50,15 @@ html,body{width:100%;height:100%;background:#07071a;display:flex;justify-content
 .play-wrap{width:100%;padding:14px 20px 24px;flex-shrink:0}
 .play-btn{width:100%;padding:16px;border-radius:16px;border:none;background:linear-gradient(135deg,#FF9900,#FF6644);color:#fff;font-size:17px;font-weight:700;cursor:pointer;letter-spacing:1px}
 .play-btn:active{transform:scale(.98)}
-#scene-game{background:#07071a;position:relative;overflow:hidden}
-#shell{position:absolute;inset:0}
+#scene-game{background:#07071a;overflow:hidden;justify-content:flex-start}
+#shell{flex:1;min-height:0;position:relative;width:100%;overflow:hidden}
 #shell canvas{display:block;width:100%;height:100%;touch-action:none;cursor:crosshair}
-#bottom-ui{position:absolute;bottom:0;left:0;width:100%;display:flex;flex-direction:column;z-index:10;pointer-events:none}
-#boom-btn{pointer-events:auto}
-#gbtns button{pointer-events:auto}
-#hud{display:flex;justify-content:space-around;align-items:center;padding:6px 0 8px;background:rgba(7,7,26,.92);width:100%}
+#bottom-ui{width:100%;flex-shrink:0;display:flex;flex-direction:column;background:#07071a;border-top:0.5px solid rgba(255,255,255,.08)}
+#hud{display:flex;justify-content:space-around;align-items:center;padding:6px 0 6px;width:100%}
 .hcol{display:flex;flex-direction:column;align-items:center;gap:1px}
 .hlbl{font-size:11px;color:rgba(255,255,255,.35)}
 .hval{font-size:18px;font-weight:500;color:#fff}
-#item-bar{display:flex;align-items:center;justify-content:center;gap:10px;padding:6px 10px;width:100%;background:rgba(7,7,26,.92);border-top:0.5px solid rgba(255,255,255,.08)}
+#item-bar{display:flex;align-items:center;justify-content:center;gap:10px;padding:4px 10px;width:100%;border-top:0.5px solid rgba(255,255,255,.08)}
 #boom-btn{display:flex;align-items:center;gap:8px;padding:8px 18px;border-radius:24px;border:1.5px solid #FF6644;background:rgba(255,100,68,.12);cursor:pointer;user-select:none}
 #boom-btn.empty{opacity:.35;pointer-events:none;border-color:rgba(255,255,255,.2)}
 #boom-btn .bicon{font-size:20px;line-height:1}
@@ -68,7 +66,7 @@ html,body{width:100%;height:100%;background:#07071a;display:flex;justify-content
 #boom-btn .bname{font-size:12px;font-weight:500;color:#FF9977}
 #boom-btn .bcnt{font-size:11px;color:rgba(255,255,255,.5)}
 #bhint{font-size:11px;color:rgba(255,255,255,.3);text-align:center}
-#gbtns{display:flex;gap:6px;padding:4px 0 6px;width:100%;justify-content:center;background:rgba(7,7,26,.92)}
+#gbtns{display:flex;gap:6px;padding:4px 0 6px;width:100%;justify-content:center}
 #gbtns button{padding:5px 11px;border-radius:20px;border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.6);font-size:11px;cursor:pointer}
 #gbtns button.on{background:rgba(255,255,255,.15);color:#fff}
 
@@ -328,7 +326,7 @@ function playSound(type){
   else if(type==='launch'){o.type='sine';o.frequency.setValueAtTime(180,now);o.frequency.exponentialRampToValueAtTime(420,now+0.15);g.gain.setValueAtTime(0.15,now);g.gain.exponentialRampToValueAtTime(0.001,now+0.16);o.start(now);o.stop(now+0.16);}
 }
 /* ── 인게임 변수 ── */
-var cv,ctx,W=450,H=800;
+var cv,ctx,W=450,H=800,SCALE=1,OX=0,OY=0;
 var WORLD_H,spd,T;
 var WALL_W,PIN_R,BALL_R,GR,MAX_SPEED,ELASTIC_MAX;
 var BO,MAX_PULL,LAUNCH_SPD;
@@ -343,7 +341,11 @@ function triggerShake(mag){shakeMag=Math.max(shakeMag,mag);}
 function updShake(){if(shakeMag<0.1){shakeMag=0;shakeX=0;shakeY=0;return;}var a=Math.random()*Math.PI*2;shakeX=Math.cos(a)*shakeMag;shakeY=Math.sin(a)*shakeMag;shakeMag*=0.6;}
 function initGame(){
   cv=document.getElementById('cv');ctx=cv.getContext('2d');
-  cv.width=W;cv.height=H;
+  var dpr=window.devicePixelRatio||1;
+  var cw=(cv.offsetWidth||W)*dpr,ch=(cv.offsetHeight||H)*dpr;
+  cv.width=cw;cv.height=ch;
+  SCALE=Math.min(cw/W,ch/H);
+  OX=(cw-W*SCALE)/2;OY=(ch-H*SCALE)/2;
   WORLD_H=H*28;spd=0.45;T=0;
   WALL_W=28;PIN_R=10;BALL_R=22;GR=0.22;MAX_SPEED=18;ELASTIC_MAX=24;
   BO={x:W/2,y:WORLD_H-130};MAX_PULL=90;LAUNCH_SPD=15;
@@ -562,7 +564,7 @@ function loopGame(){
   animId=requestAnimationFrame(loopGame);
   if(!document.getElementById('scene-game').classList.contains('active'))return;
   T+=.022*spd;updHoles();updPins();updCamera();updGauge();updShake();
-  ctx.save();ctx.translate(shakeX,shakeY);
+  ctx.save();ctx.setTransform(SCALE,0,0,SCALE,OX,OY);ctx.translate(shakeX,shakeY);
   drawBg();drawWalls();drawCeiling();drawTierBounds();drawPins();drawHoles();drawOriginBall();
   for(var pi=0;pi<pendingBalls.length;pi++)ballList.push(pendingBalls[pi]);pendingBalls=[];
   var nl=[];
@@ -579,7 +581,7 @@ function loopGame(){
   updHUD();
 }
 function setupInput(){
-  function getPos(e){var r=cv.getBoundingClientRect(),sx=W/r.width;var src=e.touches?e.touches[0]:e;return{x:(src.clientX-r.left)*sx,y:(src.clientY-r.top)*sx};}
+  function getPos(e){var r=cv.getBoundingClientRect();var src=e.touches?e.touches[0]:e;var dpr=window.devicePixelRatio||1;var cx=(src.clientX-r.left)*(cv.width/r.width);var cy=(src.clientY-r.top)*(cv.height/r.height);return{x:(cx-OX)/SCALE,y:(cy-OY)/SCALE};}
   function tryDrag(e){if(ballList.length||balls<=0)return;var p=getPos(e),bsy=ws(BO.y);if(Math.sqrt((p.x-BO.x)*(p.x-BO.x)+(p.y-bsy)*(p.y-bsy))<70)drag={sx:p.x,sy:p.y,cx:p.x,cy:p.y};}
   function doFire(){if(!drag)return;var dx=drag.cx-drag.sx,dy=drag.cy-drag.sy,len=Math.sqrt(dx*dx+dy*dy)||1,ratio=Math.min(len/MAX_PULL,1);if(ratio>.08&&balls>0){var c=getBallCoins();coins-=c;balls--;ballList.push(mkBall(BO.x,BO.y,-dx/len*LAUNCH_SPD*ratio,-dy/len*LAUNCH_SPD*ratio,c,0,false));playSound('launch');resetPins();updHUD();}drag=null;}
   cv.addEventListener('mousedown',function(e){tryDrag(e);});
