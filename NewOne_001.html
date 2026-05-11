@@ -2,11 +2,12 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <title>코인 도저 로그라이크</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#000;overflow:hidden;font-family:Arial,sans-serif;touch-action:none;user-select:none}
+body{background:#000;overflow:hidden;font-family:Arial,sans-serif;touch-action:none;user-select:none;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
 #bc{position:fixed;top:0;left:0;z-index:1}
 #divider{position:fixed;left:0;right:0;z-index:10;background:linear-gradient(90deg,#110a1a,#1a0f08,#110a1a);border-top:2px solid #ffd700;border-bottom:2px solid #e33;display:flex;align-items:center;justify-content:space-around;padding:3px 8px}
 .stat{display:flex;align-items:center;gap:4px;font-size:11px;color:#ccc;font-weight:bold}
@@ -120,7 +121,7 @@ body{background:#000;overflow:hidden;font-family:Arial,sans-serif;touch-action:n
 const DIV_H=32;
 let W,BH,DH;
 function layout(){
-  W=window.innerWidth; BH=Math.floor(window.innerHeight*0.44); DH=window.innerHeight-BH-DIV_H;
+  W=window.innerWidth; BH=Math.floor(window.innerHeight*0.38); DH=window.innerHeight-BH-DIV_H;
   document.getElementById('divider').style.top=BH+'px';
   document.getElementById('divider').style.height=DIV_H+'px';
   document.getElementById('dozer-ui').style.top=(BH+DIV_H+4)+'px';
@@ -669,12 +670,12 @@ const PURPLE_DUR_C=10;
 
 const s3=new THREE.Scene();s3.background=new THREE.Color(0x070718);s3.fog=new THREE.FogExp2(0x070718,0.024);
 const r3=new THREE.WebGLRenderer({antialias:true});
-r3.setSize(W,DH);r3.setPixelRatio(Math.min(devicePixelRatio,2));
+r3.setSize(W,DH);r3.setPixelRatio(Math.min(devicePixelRatio,1.5));
 r3.shadowMap.enabled=true;r3.shadowMap.type=THREE.PCFSoftShadowMap;
 r3.domElement.style.cssText='position:fixed;bottom:0;left:0;z-index:1';
 document.body.appendChild(r3.domElement);
-const cam3=new THREE.PerspectiveCamera(50,W/DH,0.1,100);
-cam3.position.set(0,10,13);cam3.lookAt(0,0,-0.5);
+const cam3=new THREE.PerspectiveCamera(56,W/DH,0.1,100);
+cam3.position.set(0,11.5,11);cam3.lookAt(0,0,-1.2);
 s3.add(new THREE.AmbientLight(0x223366,2));
 const dsun=new THREE.DirectionalLight(0xfffbf0,1.1);
 dsun.position.set(4,14,8);dsun.castShadow=true;
@@ -861,7 +862,7 @@ let lastT=null;
   if(!G.dead){updateBattle(dt);updateDozer(dt);}
   renderBattle();r3.render(s3,cam3);
 })(0);
-window.addEventListener('resize',()=>{layout();bc.width=W;bc.height=BH;cam3.aspect=W/DH;cam3.updateProjectionMatrix();r3.setSize(W,DH);});
+window.addEventListener('resize',()=>{layout();bc.width=W;bc.height=BH;cam3.aspect=W/DH;cam3.updateProjectionMatrix();r3.setSize(W,DH);initTrees();});
 </script>
 </body>
 </html>
