@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "978978067523",
+    "project_id": "coinbang-b6927",
+    "storage_bucket": "coinbang-b6927.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:978978067523:android:0a972c5dd32fbc28f670f6",
+        "android_client_info": {
+          "package_name": "com.nstage.coinbang"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDJ2Pp_UtETyUHJjPgDTnZFSdKBZcIVoro"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
